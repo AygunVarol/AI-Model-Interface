@@ -164,3 +164,5 @@ If you encounter issues:
 ---
 
 **Enjoy chatting with AI! 🚀**
+
+![Aygun's GitHub stats](https://github-readme-stats.vercel.app/api?username=AygunVarol&show_icons=true&theme=radical)
