@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interface for interacting with various AI models via Ollama." />
+  <title>AI Model Interface</title>
+  <style>
+    :root {
+      /* Light theme variables */
+      --primary-color: #0084ff; /* Accent blue */
+      --secondary-color: #e8f0fe; /* Light variant for borders/backgrounds */
+      --text-color: #333;
+      --background-gradient: linear-gradient(135deg, #ffffff, #f5f5f5);
+      --container-bg: rgba(255, 255, 255, 0.95);
+      --output-bg: #f9f9f9;
+      --select-bg: #ffffff;
+      --border-color: #ddd;
+    }
+    .dark-theme {
+      /* Dark theme overrides */
+      --primary-color: #66aaff; 
+      --secondary-color: #444;
+      --text-color: #ddd;
+      --background-gradient: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      --container-bg: #333;
+      --output-bg: #555;
+      --select-bg: #444;
+      --border-color: #555;
+    }
+
+    /* Include emoji-friendly fonts */
+    body {
+      font-family: 'Nunito', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--background-gradient);
+      color: var(--text-color);
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      padding: 2rem;
+      background: var(--container-bg);
+      border-radius: 1rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+
+    /* Modern toggle switch styling */
+    .theme-toggle {
+      text-align: right;
+      margin-bottom: 1rem;
+    }
+    .theme-toggle .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .theme-toggle .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .theme-toggle .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--secondary-color);
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+    .theme-toggle .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    .theme-toggle input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+    .theme-toggle input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-size: 2.2em;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    p {
+      margin-bottom: 2rem;
+      line-height: 1.7;
+      color: #555;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .dark-theme p {
+      color: #aaa;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    /* Model Selection Dropdown */
+    select {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid var(--secondary-color);
+      border-radius: 10px;
+      background: var(--select-bg);
+      color: var(--text-color);
+      box-sizing: border-box;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid var(--secondary-color);
+      border-radius: 10px;
+      resize: vertical;
+      min-height: 100px;
+      box-sizing: border-box;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background: var(--container-bg);
+      color: var(--text-color);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Modern Button Styling */
+    button {
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      outline: none;
+    }
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #output {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      border: 2px solid var(--secondary-color);
+      border-radius: 10px;
+      background: var(--output-bg);
+      min-height: 100px;
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.05);
+      font-size: 1rem;
+      overflow-y: auto;
+      color: var(--text-color);
+    }
+
+    .model-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding: 8px 12px;
+      background: var(--secondary-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .model-badge {
+      background: var(--primary-color);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      textarea, select {
+        padding: 8px;
+      }
+      .model-info {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+    }
+
+    .loading {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: bold;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <div class="container" role="article">
+    <div class="theme-toggle">
+      <label class="switch">
+        <input type="checkbox" id="themeSwitch" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <h1>AI Model Interface 🤖</h1>
+    <p>Select a model, enter your prompt, and click "Submit" to get the AI's response. Ensure your Ollama service is running locally.</p>
+
+    <form id="inputForm" class="form">
+      <div class="form-group">
+        <label for="modelSelect">Choose AI Model:</label>
+        <select id="modelSelect" name="model" required>
+          <option value="phi4">Phi-4 Mini Instruct 📚</option>
+          <option value="deepseek-r1:14b">DeepSeek R1 (14B) 🧠</option>
+          <option value="dolphin-mixtral:8x7b">Dolphin Mixtral (8x7B) 🐬</option>
+          <option value="llama2-uncensored">Llama2 Uncensored 🦙</option>
+        </select>
+      </div>
+
+      <div id="modelInfo" class="model-info">
+        <span id="modelDescription">Microsoft's compact reasoning model</span>
+        <span class="model-badge" id="modelSize">3.8B</span>
+      </div>
+
+      <div class="form-group">
+        <label for="prompt">Your Prompt:</label>
+        <textarea id="prompt" name="prompt" placeholder="Enter your prompt here... 😊" required></textarea>
+      </div>
+      <button type="submit" onclick="return submitPrompt(event)" role="button" aria-label="Submit your prompt to the model">Submit</button>
+    </form>
+
+    <div id="output" class="output-area"></div>
+  </div>
+
+  <script>
+    // Model information data
+    const modelInfo = {
+      'phi4': {
+        description: 'Microsoft\'s compact reasoning model',
+        size: '3.8B'
+      },
+      'deepseek-r1:14b': {
+        description: 'Advanced reasoning model with strong performance',
+        size: '14B'
+      },
+      'dolphin-mixtral:8x7b': {
+        description: 'Uncensored fine-tune of Mixtral mixture of experts',
+        size: '8x7B'
+      },
+      'llama2-uncensored': {
+        description: 'Uncensored version of Meta\'s Llama2',
+        size: '7B'
+      }
+    };
+
+    // Update model info when selection changes
+    document.getElementById('modelSelect').addEventListener('change', function(event) {
+      const selectedModel = event.target.value;
+      const info = modelInfo[selectedModel];
+      document.getElementById('modelDescription').textContent = info.description;
+      document.getElementById('modelSize').textContent = info.size;
+    });
+
+    // Modern dark mode toggle switch event listener
+    document.getElementById('themeSwitch').addEventListener('change', function(event) {
+      document.body.classList.toggle('dark-theme', event.target.checked);
+    });
+
+    // Add event listener for Enter key in textarea
+    document.getElementById('prompt').addEventListener('keydown', function(event) {
+      // Check if Enter is pressed without the Shift key (Shift+Enter allows new lines)
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // Prevent default Enter key behavior
+        submitPrompt(event); // Call the submit function
+      }
+    });
+
+    function submitPrompt(event) {
+      event.preventDefault();
+      const promptText = document.getElementById("prompt").value;
+      const selectedModel = document.getElementById("modelSelect").value;
+      const outputDiv = document.getElementById("output");
+      const submitButton = document.querySelector('button[type="submit"]');
+
+      // Clear any previous output
+      outputDiv.textContent = "";
+      submitButton.disabled = true;
+      submitButton.classList.add('loading');
+      submitButton.textContent = "Generating...";
+
+      fetch("/api/infer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          prompt: promptText,
+          model: selectedModel 
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        // Use the ReadableStream to process the streaming text response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        function read() {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              submitButton.disabled = false;
+              submitButton.classList.remove('loading');
+              submitButton.textContent = "Submit";
+              document.getElementById("prompt").value = '';
+              return;
+            }
+            // Append the decoded chunk to the output area
+            outputDiv.textContent += decoder.decode(value);
+            read();
+          });
+        }
+        read();
+      })
+      .catch(error => {
+        outputDiv.textContent = `Error: ${error.message}`;
+        submitButton.disabled = false;
+        submitButton.classList.remove('loading');
+        submitButton.textContent = "Submit";
+      });
+
+      return false; // Prevent form submission
+    }
+  </script>
+</body>
+</html>
