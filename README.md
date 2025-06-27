@@ -164,6 +164,3 @@ If you encounter issues:
 ---
 
 **Enjoy chatting with AI! 🚀**
-
-![License](https://img.shields.io/github/license/AygunVarol/AI-Model-Interface)
-![Stars](https://img.shields.io/github/stars/AygunVarol/AI-Model-Interface)
