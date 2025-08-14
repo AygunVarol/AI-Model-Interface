@@ -21,7 +21,7 @@ A beautiful web interface for interacting with multiple AI models via Ollama. Sw
 
 1. **Clone or download the project files**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/AygunVarol/AI-Model-Interface
    cd ai-model-interface
    ```
 
