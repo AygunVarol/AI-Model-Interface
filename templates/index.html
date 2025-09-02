@@ -293,7 +293,9 @@
           <option value="phi4">Phi-4 Mini Instruct 📚</option>
           <option value="deepseek-r1:14b">DeepSeek R1 (14B) 🧠</option>
           <option value="dolphin-mixtral:8x7b">Dolphin Mixtral (8x7B) 🐬</option>
-          <option value="llama2-uncensored">Llama2 Uncensored 🦙</option>
+          <option value="dolphin-mixtral:8x22b">Dolphin Mixtral (8x22B) 🐬</option>
+          <option value="llama2-uncensored">Llama2 Uncensored (7B) 🦙</option>
+          <option value="llama2-uncensored:70b">Llama2 Uncensored (70B) 🦙</option>
         </select>
       </div>
 
@@ -327,9 +329,17 @@
         description: 'Uncensored fine-tune of Mixtral mixture of experts',
         size: '8x7B'
       },
+      'dolphin-mixtral:8x22b': {
+        description: 'Larger uncensored fine-tune of Mixtral mixture of experts',
+        size: '8x22B'
+      },
       'llama2-uncensored': {
         description: 'Uncensored version of Meta\'s Llama2',
         size: '7B'
+      },
+      'llama2-uncensored:70b': {
+        description: 'Large uncensored version of Meta\'s Llama2',
+        size: '70B'
       }
     };
 

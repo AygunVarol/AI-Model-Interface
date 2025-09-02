@@ -12,7 +12,9 @@ MODEL_MAP = {
     'phi4': 'phi4',
     'deepseek-r1:14b': 'deepseek-r1:14b',
     'dolphin-mixtral:8x7b': 'dolphin-mixtral:8x7b',
-    'llama2-uncensored': 'llama2-uncensored'
+    'dolphin-mixtral:8x22b': 'dolphin-mixtral:8x22b',
+    'llama2-uncensored': 'llama2-uncensored',
+    'llama2-uncensored:70b': 'llama2-uncensored:70b'
 }
 
 # Model information for validation and display
@@ -32,10 +34,20 @@ MODEL_INFO = {
         'size': '8x7B',
         'description': 'Uncensored fine-tune of Mixtral mixture of experts'
     },
+    'dolphin-mixtral:8x22b': {
+        'name': 'Dolphin Mixtral',
+        'size': '8x22B',
+        'description': 'Larger uncensored fine-tune of Mixtral mixture of experts'
+    },
     'llama2-uncensored': {
         'name': 'Llama2 Uncensored',
         'size': '7B',
         'description': 'Uncensored version of Meta\'s Llama2'
+    },
+    'llama2-uncensored:70b': {
+        'name': 'Llama2 Uncensored',
+        'size': '70B',
+        'description': 'Large uncensored version of Meta\'s Llama2'
     }
 }
 
@@ -179,5 +191,5 @@ def verify_models():
 if __name__ == '__main__':
     print("🚀 Starting AI Model Interface Server...")
     verify_models()
-    print("🌐 Server starting on http://localhost:5000")
+    print("🌍 Server starting on http://localhost:5000")
     app.run(host="0.0.0.0", port=5000, debug=True)
